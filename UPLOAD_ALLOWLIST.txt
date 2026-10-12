@@ -3,6 +3,8 @@ CHANGELOG.md
 CITATION.cff
 DATA_ACCESS.md
 DISPLAY_INPUT_MANIFEST.csv
+ENVIRONMENT/requirements-array-tested.txt
+ENVIRONMENT/requirements-array.txt
 ENVIRONMENT/requirements-tested.txt
 ENVIRONMENT/tested_platform.json
 EXPECTED_NUMERICAL_OUTPUTS/README.md
@@ -10,6 +12,7 @@ EXPECTED_NUMERICAL_OUTPUTS/SYNTHETIC_COMPARISON.json
 FIGURE_TABLE_REPRODUCTION_MAP.csv
 INPUT_SCHEMA.md
 LICENSE
+MINIMAL_INPUTS.md
 README.md
 README_CN.md
 REPRODUCTION.md
@@ -24,6 +27,7 @@ display/bind_results.py
 display/encode_svg_text.py
 display/english_labels.py
 display/frozen_plot_suite.py
+display/input_contract.py
 display/layout_check.py
 display/normalize_svg_pdf.py
 display/render_core.py
@@ -47,4 +51,5 @@ requirements.txt
 run_ncs.py
 tests/test_adapter_interface.py
 tests/test_core.py
+tests/test_minimal_inputs.py
 tests/test_pipeline.py

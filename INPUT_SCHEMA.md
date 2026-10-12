@@ -12,7 +12,7 @@ Structural NPZ inputs contain FA, binary left/right masks and **independent sour
 
 The display directory contains `SOURCE_DATA/`, `IMAGING/`, `ASSETS/`, `RUN_RECORDS/rendering.json` and `TABLES_EN.json`. `DISPLAY_INPUT_MANIFEST.csv` lists required file names, array keys/shapes or table columns, without patient values or paths. Assets are controlled and intentionally not bundled.
 
-The current renderer loads shared layout/source caches at initialization, so each `--group` command requires the **complete approved display bundle**, including the P07 strip/time-course caches, even when rendering another figure. Figure-specific dependencies and shared dependency scope are explicit in the map. This is a real limitation of this packaging, not an assertion that each figure is independently self-contained.
+The renderer reads only selected-output dependencies declared in display/input_contract.py. Run `python render_figures.py --group 6 --list-inputs` for a precise list. Missing necessary files stop execution with their names; unrelated clinical files are not opened. Recorded channels are validated against the confirmed topology and saved array axes. A single formatted table can be supplied as Table_ID_EN.json without any other table.
 
 `TABLES_EN.json` maps logical keys `1`, `S1`…`S9` to lists of `{caption, rows}` blocks. The export preserves all supplied rows verbatim, including continuation tables; it does not infer numbers from images. The clinical publication binder rebuilds S2–S5 and plotted core summaries from numerical outputs; other frozen descriptive/validation tables are carried from their approved source tables, not estimated anew.
 

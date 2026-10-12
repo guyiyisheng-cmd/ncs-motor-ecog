@@ -1,3 +1,10 @@
+## Packaging and documentation 2026-10-12.2
+
+- Corrected unsupported statements that public derived-data permission already existed. No patient data added.
+- Replaced import-time clinical reads with per-figure input loading, explicit missing-file reports, and topology/axis validation; added individual supplementary-figure selectors and minimal table JSON support.
+- Preserved the v1.0 numerical core, frozen plotting calculations, color limits and observations. Added eight synthetic/contract tests for packaging isolation.
+- The existing v1.0.0-ebio.20261012 tag and commit remain unchanged. Access-contact and item-specific permission decisions are tracked separately from software publication.
+
 # Changes
 
 ## v1.0.0-ebio.20261012
