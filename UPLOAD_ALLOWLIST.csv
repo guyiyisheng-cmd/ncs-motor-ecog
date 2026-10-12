@@ -3,12 +3,12 @@ path,bytes,sha256,content_class,license_status,remote_upload_authorized
 CHANGELOG.md,856,66e697b46b4f742d4c819b73d59768f7a2110ea5f8bdeb80c82e6bdbdf956905,code/schema/docs/synthetic only,MIT; dependencies retain upstream licenses,True
 CITATION.cff,638,9276daeace5c3ec7c9c8e764308b43851134d24652c5138850e7df5d426ee8f5,code/schema/docs/synthetic only,MIT; dependencies retain upstream licenses,True
 DATA_ACCESS.md,1383,5a64b9d1cc611f512397e1b15f2e5b8ee7a0183b741cc45c7a9c3935f638a552,code/schema/docs/synthetic only,MIT; dependencies retain upstream licenses,True
-DISPLAY_INPUT_MANIFEST.csv,15301,eeb371337f8b1fc8b12bc87747b32927b74a03f0c27c16136ffd66427cd0aad7,code/schema/docs/synthetic only,MIT; dependencies retain upstream licenses,True
+DISPLAY_INPUT_MANIFEST.csv,15243,eae307776426974e743a23a3e55e4fcf96dbb90a13dbf5989dadac9ee5aa9b02,code/schema/docs/synthetic only,MIT; dependencies retain upstream licenses,True
 ENVIRONMENT/requirements-tested.txt,482,a5f427469e20ae6ae24adab9c8dc7abae353ba093f99ba39a29a50612f9b789e,code/schema/docs/synthetic only,MIT; dependencies retain upstream licenses,True
 ENVIRONMENT/tested_platform.json,281,d19b30566eeb2489d020a40de03c237de6730d4459a3270d9ee30018882ee425,code/schema/docs/synthetic only,MIT; dependencies retain upstream licenses,True
 EXPECTED_NUMERICAL_OUTPUTS/README.md,357,c3adb06c315c953fec55ec3e74f0ba8b8a56657d41269e92dec417dbf75899d4,code/schema/docs/synthetic only,MIT; dependencies retain upstream licenses,True
 EXPECTED_NUMERICAL_OUTPUTS/SYNTHETIC_COMPARISON.json,889,4457471f72f69c0516f3a6e5d671ba67267c7a73b5e5291b3b3113001e32d4a2,code/schema/docs/synthetic only,MIT; dependencies retain upstream licenses,True
-FIGURE_TABLE_REPRODUCTION_MAP.csv,31304,9dabbb8cc83c89ad814ca37aa9621180a2b3770778849fd0ae853f369d830741,code/schema/docs/synthetic only,MIT; dependencies retain upstream licenses,True
+FIGURE_TABLE_REPRODUCTION_MAP.csv,31266,493536c6a9ba7cc389eaac384535df1ab011163e2624bc58ef70b1b334c6a1cb,code/schema/docs/synthetic only,MIT; dependencies retain upstream licenses,True
 INPUT_SCHEMA.md,2931,3da1e64d750565796b1952acba07b3dfa66174efbf12e537d8a872ead3208584,code/schema/docs/synthetic only,MIT; dependencies retain upstream licenses,True
 LICENSE,1241,48e5a76d05de223238667c4375802070e9fddfcb6815d8051e10f90c006088e2,code/schema/docs/synthetic only,MIT; dependencies retain upstream licenses,True
 README.md,3284,9027e7a07a8b247c6f7880722dc85c703d50764ae1a87b93703ae57b951faefb,code/schema/docs/synthetic only,MIT; dependencies retain upstream licenses,True
