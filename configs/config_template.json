@@ -1,0 +1,32 @@
+{
+  "schema": "ncs-run-1",
+  "method_reference": "docs/METHOD_CN.md#explicit-estimands",
+  "conditions": [
+    "Move",
+    "Imagine"
+  ],
+  "task": [
+    0,
+    5
+  ],
+  "baseline": [
+    -2,
+    0
+  ],
+  "include_right_endpoint": true,
+  "n_resamples": 1000,
+  "seed": 20260927,
+  "pac_quantile": 0.95,
+  "pac_grids": {
+    "full": "all",
+    "narrow": [
+      0,
+      1
+    ]
+  },
+  "min_valid_fraction": 0.95,
+  "subjects": [],
+  "structure": [],
+  "spatial_pairs": null,
+  "note": "Template only. The local source adapter must populate real, explicitly keyed subjects. No target statistics."
+}

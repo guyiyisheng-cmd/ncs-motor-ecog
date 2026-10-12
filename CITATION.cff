@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "Please cite the exact software release URL and commit. The collective contributor name below is retained from the original MIT notice; no individual authorship is inferred."
+type: software
+title: "NCS motor ECoG: frozen numerical method and controlled-input display code"
+version: "v1.0.0-ebio.20261012"
+date-released: "2026-10-12"
+license: MIT
+repository-code: "https://github.com/guyiyisheng-cmd/ncs-motor-ecog"
+authors:
+  - name: "NCS Method code contributors"
+abstract: "Frozen method v1.0 with public synthetic tests and controlled-input clinical reproduction interfaces. Patient data are not included."

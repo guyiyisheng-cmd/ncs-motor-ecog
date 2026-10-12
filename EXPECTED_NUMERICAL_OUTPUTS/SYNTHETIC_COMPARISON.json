@@ -1,0 +1,37 @@
+{
+  "atol": 1e-12,
+  "errors": [],
+  "passed": true,
+  "rtol": 1e-10,
+  "scope": "numerical_reproducibility_not_scientific_validation",
+  "table_comparisons": [
+    {
+      "file": "tables/channel_action_differences.csv",
+      "max_absolute_numeric_error": 0.0
+    },
+    {
+      "file": "tables/channel_conditions.csv",
+      "max_absolute_numeric_error": 0.0
+    },
+    {
+      "file": "tables/combined_channel_conditions.csv",
+      "max_absolute_numeric_error": 0.0
+    },
+    {
+      "file": "tables/equal_patient_descriptions.csv",
+      "max_absolute_numeric_error": 0.0
+    },
+    {
+      "file": "tables/hierarchical_statistics.csv",
+      "max_absolute_numeric_error": 0.0
+    },
+    {
+      "file": "tables/spatial_descriptions.csv",
+      "max_absolute_numeric_error": 0.0
+    },
+    {
+      "file": "tables/structure.csv",
+      "max_absolute_numeric_error": 0.0
+    }
+  ]
+}
