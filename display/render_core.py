@@ -10,7 +10,6 @@ from matplotlib import font_manager
 from matplotlib.colors import Normalize,ListedColormap,LinearSegmentedColormap
 from matplotlib.patches import Rectangle,ConnectionPatch,Patch
 from PIL import Image
-import cairosvg
 from english_labels import install,fit_labels,translate
 install()
 plt.rcParams.update({'font.family':'DejaVu Sans','font.size':8,'pdf.fonttype':42,'svg.fonttype':'none','figure.facecolor':'white','savefig.facecolor':'white','axes.linewidth':.6,'axes.spines.top':False,'axes.spines.right':False})
@@ -18,10 +17,41 @@ from layout_check import require_matplotlib_panel_alignment
 OLD=R;AROOT=R/'SOURCE_DATA';BROOT=AROOT
 CM=LinearSegmentedColormap.from_list('blue_white_orange',['#21658C','#FFFFFF','#BE5A20']);BLUE='#267B9B';ORANGE='#C27636';GRAY='#526570';LC='#2A7894';RC='#C48243';LINK='#87747A'
 ACTS=['fingerLeft','fingerRight','fistLeft','fistRight','lip'];CN=['左指','右指','左拳','右拳','唇部'];STATE=['Move','Imagine','difference'];SCN=['执行','想象','想象−执行']
-LIM=json.loads((OLD/'RUN_RECORDS/rendering.json').read_text())
-S=pd.read_csv(AROOT/'P07_static_arrays.csv',float_precision='round_trip');D=pd.read_csv(AROOT/'P07_beta_dynamic_windows.csv',float_precision='round_trip');P=pd.read_csv(AROOT/'P07_pooled_dynamic_windows.csv',float_precision='round_trip')
-Z=np.load(AROOT/'P07_pooled_beta_curves.npz');CH=Z['channels'].tolist();T=Z['times_s'];C=Z['values_db'];AZ=np.load(AROOT/'P07_beta_display_curves.npz')
 manifest=[]
+
+def prepare_array_inputs(item):
+ """Load only the selected display's saved inputs; preserve their axis order."""
+ global S,D,P,Z,CH,T,C,AZ,LIM
+ topology=pd.read_csv(AROOT/'P07_contact_topology.csv',float_precision='round_trip')
+ expected=[f'strip{s}-contact{k}' for s in range(1,4) for k in range(1,9)]
+ if topology['name'].tolist()!=expected:
+  raise ValueError('Topology order differs from the confirmed three-strip display contract')
+ CH=topology['recorded_channel'].dropna().tolist()
+ for i,value in enumerate(topology['recorded_channel']):
+  if pd.notna(value) and value!=f'C{i+1}':
+   raise ValueError('Contact/channel mapping differs from the frozen display geometry')
+ if len(CH)!=len(set(CH)):
+  raise ValueError('Duplicate recorded channel in topology')
+ if item in ['6','7','movie'] or item.startswith('S10'):
+  LIM=json.loads((OLD/'RUN_RECORDS/rendering.json').read_text())
+ if item=='6':
+  S=pd.read_csv(AROOT/'P07_static_arrays.csv',float_precision='round_trip')
+  if set(S.channel)!=set(CH):raise ValueError('Static channel set differs from topology')
+ if item=='7':
+  P=pd.read_csv(AROOT/'P07_pooled_dynamic_windows.csv',float_precision='round_trip')
+  if set(P.channel)!=set(CH):raise ValueError('Pooled window channel set differs from topology')
+ if item=='movie' or item.startswith('S10'):
+  D=pd.read_csv(AROOT/'P07_beta_dynamic_windows.csv',float_precision='round_trip')
+  if set(D.channel)!=set(CH):raise ValueError('Action window channel set differs from topology')
+ if item in ['7','S11']:
+  Z=np.load(AROOT/'P07_pooled_beta_curves.npz');T=Z['times_s'];C=Z['values_db']
+  if Z['channels'].tolist()!=CH:raise ValueError('Pooled curve channel axis differs from topology')
+  if Z['conditions'].tolist()!=STATE[:2]:raise ValueError('Pooled condition axis differs from frozen display')
+ if item.startswith('S9'):
+  AZ=np.load(AROOT/'P07_beta_display_curves.npz');T=AZ['times_s']
+  if AZ['channels'].tolist()!=CH:raise ValueError('Action curve channel axis differs from topology')
+  if AZ['conditions'].tolist()!=STATE[:2]:raise ValueError('Action condition axis differs from frozen display')
+
 def js(p,v):p.write_text(json.dumps(v,ensure_ascii=False,indent=2))
 def ax(f,x,y,w,h):return f.add_axes([x/(f.get_figwidth()*25.4),y/(f.get_figheight()*25.4),w/(f.get_figwidth()*25.4),h/(f.get_figheight()*25.4)])
 def tx(f,x,y,t,**kw):return f.text(x/(f.get_figwidth()*25.4),y/(f.get_figheight()*25.4),t,**kw)
@@ -62,6 +92,7 @@ def translate_svg(root):
   if 'font-family' in e.attrib:e.set('font-family','DejaVu Sans, sans-serif')
 
 def f1():
+ import cairosvg
  ns='http://www.w3.org/2000/svg';ET.register_namespace('',ns)
  p=R/'ASSETS/Figure1_visual_refinement.svg';root=ET.parse(p).getroot();root.set('width','180mm');root.set('height','152mm')
  for e in root.iter('{'+ns+'}g'):
@@ -133,20 +164,23 @@ def f2():
  export(f,'Figure_2_FA_CST',axes=axes,rows=rows,cols=cols,sources=['native structure NPZ; unchanged selected-slice indices','IMAGING_CST_quantitative_reused.csv'])
  js(O/'RUN_RECORDS/CST_display.json',checks)
 
-def old_plot_suite():
+def old_plot_suite(selected=None):
  # Reuse the original plotting functions and exact source tables. Alter display constants only.
  p=Path(__file__).parent/'frozen_plot_suite.py'
  spec=importlib.util.spec_from_file_location('style_plots',p);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
  original=pd.read_csv
  def exact(*args,**kw):kw.setdefault('float_precision','round_trip');return original(*args,**kw)
  m.pd.read_csv=exact
- for fn in [m.response,m.differences,m.relations,m.pooled,m.pac,m.other_tfr,m.baseline_supp]:fn();print(fn.__name__,flush=True)
+ for key,fn in [('3',m.response),('4',m.differences),('5',m.relations),('S1',m.pooled),('S2',m.pac),('S3',m.other_tfr),('S5',m.baseline_supp)]:
+  if selected is None or key in selected:fn();print(fn.__name__,flush=True)
  m.pd.read_csv=original
  manifest.extend(m.manifest)
  # S4/S6: existing valid image geometry, no numeric rendering changes; labels enlarged.
  ns='http://www.w3.org/2000/svg';ET.register_namespace('',ns)
  import re
- for stem in ['Figure_S4_registration','Figure_S6_surface_overview_detail']:
+ for key,stem in [('S4','Figure_S4_registration'),('S6','Figure_S6_surface_overview_detail')]:
+  if selected is not None and key not in selected:continue
+  import cairosvg
   root=ET.parse(OLD/'ASSETS'/f'{stem}.svg').getroot()
   for e in root.iter('{'+ns+'}text'):
    st=e.get('style','');ma=re.search(r'font-size: ([0-9.]+)px',st)
@@ -157,6 +191,7 @@ def old_plot_suite():
   manifest.append({'stem':stem,'sources':[str((OLD/'ASSETS'/f'{stem}.svg').relative_to(R))],'raster_and_paths_unchanged':True})
 
 def f6():
+ prepare_array_inputs('6')
  f=plt.figure(figsize=(260/25.4,157/25.4));axes=[]
  tx(f,4,151,'a  P07：已确认的条带与通道',fontsize=10,fontweight='bold')
  for s in range(3):
@@ -177,6 +212,7 @@ def f6():
  rows=[{'panels':[str(mi*15+ai*3+ci) for ci in range(3)]} for mi in range(2) for ai in range(5)];cols=[{'panels':[str(mi*15+ai*3+ci) for ai in range(5)]} for mi in range(2) for ci in range(3)]
  export(f,'Figure_6_P07_static_array',axes=axes,rows=rows,cols=cols,sources=['P07_static_arrays.csv','P07_contact_topology.csv'])
 def f7():
+ prepare_array_inputs('7')
  f=plt.figure(figsize=(260/25.4,166/25.4));axes=[];xl,xr=16,250;step=(xr-xl)/7;start=xl+2*step;lim=LIM['pooled_beta_shared_limit']
  for w in range(5):
   left=start+w*step;f.add_artist(Rectangle((left/260,16/166),step/260,130/166,transform=f.transFigure,facecolor=['#eff4f6','#fafbfc'][w%2],edgecolor='none',zorder=-10));tx(f,left+step/2,149,f'{w}–{w+1} s',ha='center',fontsize=9)
@@ -219,13 +255,24 @@ def channel_grid(f,curves=None,tfrdata=None):
   tx(f,3,111-s*35,f'条带{s+1}',rotation=90,fontsize=8,va='center')
  return axes
 
-def si_grids():
- z=np.load(AROOT/'P07_allchannel_TFR_display.npz');lim=float(np.max(np.abs(z['values_db'])))
+def si_grids(selected=None):
+ global T
+ selected=selected or ['S7','S8']+[f'S9{x}' for x in 'abcde']+[f'S10{x}' for x in 'abcde']+['S11']
+ if any(x in selected for x in ['S7','S8']):
+  prepare_array_inputs('S7')
+  z=np.load(AROOT/'P07_allchannel_TFR_display.npz');lim=float(np.max(np.abs(z['values_db'])))
+  T=z['times_s']
+  if z['channels'].tolist()!=CH:raise ValueError('TFR channel axis differs from topology')
+  if z['conditions'].tolist()!=STATE[:2]:raise ValueError('TFR condition axis differs from frozen display')
  for ci,c in enumerate(STATE[:2]):
+  if f'S{7+ci}' not in selected:continue
   f=plt.figure(figsize=(260/25.4,147/25.4));tx(f,5,139,'P07 · '+SCN[ci]+'：全通道时频反应',fontsize=10,fontweight='bold')
   aa=channel_grid(f,tfrdata=(z['values_db'][ci],z['frequencies_hz'],lim));bar(f,84,12,75,lim,'功率（dB）');tx(f,5,1,'横轴：时间（s）；纵轴：频率（Hz）。沿用原4–90 Hz数组；每状态30事件，原共享色标。',fontsize=8,color=GRAY)
   rows,cols=gridgroups(3,8);export(f,f'Figure_S{7+ci}_P07_allchannel_TFR_{c}',False,aa,rows,cols,['P07_allchannel_TFR_display.npz'])
  for ai,action in enumerate(ACTS+['pooled']):
+  key='S11' if action=='pooled' else f'S9{chr(97+ai)}'
+  if key not in selected:continue
+  prepare_array_inputs(key)
   cc=C if action=='pooled' else AZ['values_db'][AZ['actions'].tolist().index(action)]
   f=plt.figure(figsize=(260/25.4,140/25.4));tx(f,5,132,'P07 · '+('五动作合并' if action=='pooled' else CN[ai])+'：全部22通道时程',fontsize=10,fontweight='bold');tx(f,197,132,'执行',fontsize=9,color=BLUE);tx(f,230,132,'想象',fontsize=9,color=ORANGE)
   aa=channel_grid(f,curves=cc);tx(f,5,7,'横轴：时间（s）；纵轴：β变化（dB）。灰底为任务期，未记录触点留空；所有已保存时点完整显示。',fontsize=8,color=GRAY)
@@ -233,6 +280,9 @@ def si_grids():
   export(f,stem,False,aa,rows,cols,['P07_pooled_beta_curves.npz' if action=='pooled' else 'P07_beta_display_curves.npz'])
  # S10 from saved five-window table (never recompute a window from timeseries).
  for ai,action in enumerate(ACTS):
+  key=f'S10{chr(97+ai)}'
+  if key not in selected:continue
+  prepare_array_inputs(key)
   f=plt.figure(figsize=(260/25.4,122/25.4));tx(f,5,115,f'P07 · {CN[ai]}：五个固定1秒窗中的β阵列',fontsize=10,fontweight='bold');aa=[];lim=LIM['action_beta_shared_limit']
   for wi in range(5):tx(f,49+wi*45,103,f'{wi}–{wi+1} s',ha='center',fontsize=9)
   for ci,state in enumerate(STATE):
@@ -243,6 +293,7 @@ def si_grids():
   rows,cols=gridgroups(3,5);export(f,f'Figure_S10{chr(97+ai)}_P07_dynamic_{action}',False,aa,rows,cols,['P07_beta_dynamic_windows.csv'])
 
 def animation():
+ prepare_array_inputs('movie')
  frames=[];lim=LIM['action_beta_shared_limit']
  for wi in range(5):
   f=plt.figure(figsize=(180/25.4,183/25.4));tx(f,5,175,'P07 · β阵列的五窗逐帧展示',fontsize=11,fontweight='bold');tx(f,5,166,f'当前任务窗：{wi}–{wi+1} s',fontsize=10,fontweight='bold');aa=[]
